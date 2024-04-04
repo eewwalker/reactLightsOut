@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { sample } from "lodash";
 import Cell from "./Cell";
 import "./Board.css";
 
@@ -24,21 +25,33 @@ import "./Board.css";
  *  This should render an HTML table of individual <Cell /> components.
  *
  *  This doesn't handle any clicks --- clicks are on individual cells
- *
+ *, chanceLightStartsOn
  **/
 
-function Board({ nrows, ncols, chanceLightStartsOn }) {
+function Board({ nrows, ncols}) {
   const [board, setBoard] = useState(createBoard());
 
   /** create a board nrows high/ncols wide, each cell randomly lit or unlit */
   function createBoard() {
     let initialBoard = [];
-    // TODO: create array-of-arrays of true/false values
+    const status = [true, false];
+
+    for (let row = 0; row < nrows; row++) {
+      let newRow = [];
+      for (let col = 0; col < ncols; col++) {
+        newRow.push(sample(status));
+
+      }
+      initialBoard.push(newRow);
+    }
+
     return initialBoard;
   }
-
+  /** Checks board game if any value is equal to true  */
   function hasWon() {
-    // TODO: check the board in state to determine whether the player has won.
+   const hasLight = board.map(b => b.filter(l => l === true));
+
+    return hasLight.length === 0;
   }
 
   function flipCellsAround(coord) {
@@ -53,14 +66,28 @@ function Board({ nrows, ncols, chanceLightStartsOn }) {
         }
       };
 
-      // TODO: Make a (deep) copy of the oldBoard
+      const boardCopy = oldBoard.map(row => [...row]);
+      flipCell(y, x, boardCopy);
+      flipCell(y-1, x, boardCopy);
+      flipCell(y, x-1, boardCopy);
+      flipCell(y+1, x, boardCopy);
+      flipCell(y, x+1, boardCopy);
 
-      // TODO: in the copy, flip this cell and the cells around it
+      return boardCopy;
 
-      // TODO: return the copy
     });
   }
-
+console.log('board', board)
+createBoard();
+    return (
+      <div className="Board">
+        <table>
+          <tr>
+            {board.map(b => b.map(board => <Cell flipCellsAroundMe = {flipCellsAround}/>))}
+          </tr>
+        </table>
+      </div>
+    )
   // if the game is won, just show a winning msg & render nothing else
 
   // TODO
